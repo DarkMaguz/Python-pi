@@ -41,12 +41,13 @@ else:
 	venstre = "venstre"
 
 
+# Send signal til driver ICen L293D om hvilken retning robotten skal tag.
 def robotDo(opperation):
 	#print opperation
 	for t in opperation:
 		GPIO.output(*t)
 
-#Hent SPI data fra MCP3008 chippen.
+# Hent SPI data fra MCP3008 chippen.
 def hentData(kanal):
         adc = spi.xfer2([1,(8+kanal)<<4,0])
         data = ((adc[1]&3) << 8) + adc[2]
@@ -56,6 +57,8 @@ def hentData(kanal):
 def erPaaStregen():
 	return hentData(0) > graenseVaerdi
 
+# Skifter den retning roboten skal søge efter stregen.
+# Det vil altid være modsat af den sidste retning.
 def nyRetning():
 	global sidsteRetning
 	if sidsteRetning == 1:
@@ -65,7 +68,8 @@ def nyRetning():
 		sidsteRetning = 1
 		robotDo(hoejre)
 
-def genstart():
+# Genoptager den sidste retning.
+def genoptag():
 	if sidsteRetning == 1:
 		robotDo(hoejre)
 	else:
@@ -89,7 +93,7 @@ try:
 	while True:
 		# Vent på at sensoren er over stregen.
 		while not erPaaStregen():
-			genstart()
+			genoptag()
 			time.sleep(0.01)
 			robotDo(stop)
 		# Nu er sonsoren over stregen, så vi skal køre frem.
