@@ -29,7 +29,7 @@ if __name__ == '__main__':
         while True:
             val = readAdc(0)
             print "ADC Result: ", str(val)
-            time.sleep(5)
+            time.sleep(0.1)
     except KeyboardInterrupt:
         spi.close() 
         sys.exit(0)
