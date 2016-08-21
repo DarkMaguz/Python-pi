@@ -34,7 +34,7 @@ for pin in motorPins:
 	# Set duty cycle til 0, så løber robotten ikke væk fra os.
 	pwm[pin].start(0)
 
-# Lav en liste af tuples til hver opperation af motorne.
+# Lav en liste af tuples til hver operation af motorne.
 if True:
 	stop = [(11, 0), (12, 0), (15, 0), (16, 0)]
 	tilbage = [(12, 1), (15, 1)]

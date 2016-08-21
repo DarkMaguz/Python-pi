@@ -23,10 +23,10 @@ motorPins = [11, 12, 15, 16]
 # Set pin nummerne i "motorPins" til output.
 for pin in motorPins:
 	GPIO.setup(pin, GPIO.OUT)
-	# Sørg for at slukke før vi tænder.
+	# Sørg for at slukke før vi tænder, så løber robotten ikke væk fra os.
 	GPIO.output(pin, 0)
 
-# Lav en liste af tuples til hver opperation af motorne.
+# Lav en liste af tuples til hver operation af motorne.
 if True:
 	stop = [(11, 0), (12, 0), (15, 0), (16, 0)]
 	tilbage = [(12, 1), (15, 1)]
@@ -42,9 +42,9 @@ else:
 
 
 # Send signal til driver ICen L293D om hvilken retning robotten skal tag.
-def robotDo(opperationer):
-	#print opperationer
-	for operation in opperationer:
+def robotDo(operationer):
+	#print operationer
+	for operation in operationer:
 		GPIO.output(*operation)
 
 # Hent SPI data fra MCP3008 chippen.
