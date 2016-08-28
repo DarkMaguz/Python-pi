@@ -13,7 +13,7 @@ graenseVaerdi = 50
 # Den retning robotten sidst drejede. 0 for venstre og 1 for højre.
 sidsteRetning = 1
 # Standart duty cycle.
-stdDC = 40
+#stdDC = 100
 
 # Konfigurer Raspberry PI's GPIO.
 # Fortæl hvilken måde hvorpå vi fortolker GPIO pin's på.
@@ -30,34 +30,27 @@ for pin in motorPins:
 	# Sørg for at slukke før vi tænder, så løber robotten ikke væk fra os.
 	GPIO.output(pin, 0)
 	# Initialiser pwm på "pin" med 50Hz.
-	pwm[pin] = GPIO.PWM(pin, 50)
+	#pwm[pin] = GPIO.PWM(pin, 50)
 	# Set duty cycle til 0, så løber robotten ikke væk fra os.
-	pwm[pin].start(0)
+	#pwm[pin].start(0)
 
 # Lav en liste af tuples til hver operation af motorne.
-if True:
-	stop = [(11, 0), (12, 0), (15, 0), (16, 0)]
-	tilbage = [(12, 1), (15, 1)]
-	frem = [(11, 1), (16, 1)]
-	hoejre = [(11, 1)]
-	venstre = [(16, 1)]
-else:
-	stop = "stop"
-	frem = "frem"
-	tilbage = "tilbage"
-	hoejre = "højre"
-	venstre = "venstre"
+stop = [(11, 0), (12, 0), (15, 0), (16, 0)]
+tilbage = [(12, 1), (15, 1)]
+frem = [(11, 1), (16, 1)]
+hoejre = [(16, 1)]
+venstre = [(11, 1)]
 
-def robotDoPWM(pin, tilstand):
-	dc = stdDC if tilstand else 0
-	pwm[pin].ChangeDutyCycle(dc)
+#def robotDoPWM(pin, tilstand):
+#	dc = stdDC if tilstand else 0
+#	pwm[pin].ChangeDutyCycle(dc)
 
 # Send signal til driver ICen L293D om hvilken retning robotten skal tag.
 def robotDo(opperationer):
 	#print opperationer
 	for opperation in opperationer:
-		#GPIO.output(*opperation)
-		robotDoPWM(*opperation)
+		GPIO.output(*opperation)
+		#robotDoPWM(*opperation)
 
 # Hent SPI data fra MCP3008 chippen.
 def hentData(kanal):
@@ -75,21 +68,21 @@ def erPaaStregenV():
 
 # Skifter den retning roboten skal søge efter stregen.
 # Det vil altid være modsat af den sidste retning.
-def nyRetning():
-	global sidsteRetning
-	if sidsteRetning == 1:
-		sidsteRetning = 0
-		robotDo(venstre)
-	else:
-		sidsteRetning = 1
-		robotDo(hoejre)
+#def nyRetning():
+#	global sidsteRetning
+#	if sidsteRetning == 1:
+#		sidsteRetning = 0
+#		robotDo(venstre)
+#	else:
+#		sidsteRetning = 1
+#		robotDo(hoejre)
 
 # Genoptager den sidste retning.
-def genoptag():
-	if sidsteRetning == 1:
-		robotDo(hoejre)
-	else:
-		robotDo(venstre)
+#def genoptag():
+#	if sidsteRetning == 1:
+#		robotDo(hoejre)
+#	else:
+#		robotDo(venstre)
 
 # Vi ryder altid op efter os når vi har brugt robotten.
 def onExit():
@@ -115,36 +108,25 @@ try:
 	#1
 	while True:
 		#2
+		print "#2"
 		robotDo(hoejre)
-		#3 
+		#3
+		print "#3"
 		while not erPaaStregenH():
 			time.sleep(0.01)
 		#4
+		print "#4"
 		robotDo(stop)
 		#5
+		print "#5"
 		robotDo(venstre)
 		#6
+		print "#6"
 		while not erPaaStregenV():
 			time.sleep(0.01)
 		#7
+		print "#7"
 		robotDo(stop)
-
-#		# Vent på at sensoren er over stregen.
-#		while not erPaaStregenV() or erPaaStregenH():
-#			if erPaaStregenV():
-#				robotDo(hoejre)
-#			else
-#				robotDo(venstre)
-#			genoptag()
-#			time.sleep(0.01)
-#			robotDo(stop)
-#		# Nu er sonsoren over stregen, så vi skal køre frem.
-#		robotDo(frem)
-#		# Køre fremad så længe sensoren er over stregen.
-#		while (erPaaStregen()):
-#			time.sleep(0.1)
-#		# Sensoren er nu ikke længere over stregen, så skifter vi retning.
-#		nyRetning()
 		
 # Ved Ctrl+C fanges untagelsen "KeyboardInterrupt".
 except KeyboardInterrupt:	
