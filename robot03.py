@@ -10,10 +10,6 @@ spi.open(0, 0) # Åben port 0, enhed 0.
 
 # Set grænseværdien for hvornår vi med stor sandsynlighed kan sige at vi er på en streg.
 graenseVaerdi = 50
-# Den retning robotten sidst drejede. 0 for venstre og 1 for højre.
-sidsteRetning = 1
-# Standart duty cycle.
-#stdDC = 100
 
 # Konfigurer Raspberry PI's GPIO.
 # Fortæl hvilken måde hvorpå vi fortolker GPIO pin's på.
@@ -21,18 +17,12 @@ GPIO.setmode(GPIO.BOARD)
 
 # Lav en liste indeholdende pins der bruges til mortorne.
 motorPins = [11, 12, 15, 16]
-# Initialiser en dict til og holde på pwm objekter.
-pwm = {}
 
 # Set pin nummerne i "motorPins" til output.
 for pin in motorPins:
 	GPIO.setup(pin, GPIO.OUT)
 	# Sørg for at slukke før vi tænder, så løber robotten ikke væk fra os.
 	GPIO.output(pin, 0)
-	# Initialiser pwm på "pin" med 50Hz.
-	#pwm[pin] = GPIO.PWM(pin, 50)
-	# Set duty cycle til 0, så løber robotten ikke væk fra os.
-	#pwm[pin].start(0)
 
 # Lav en liste af tuples til hver operation af motorne.
 stop = [(11, 0), (12, 0), (15, 0), (16, 0)]
@@ -41,16 +31,10 @@ frem = [(11, 1), (16, 1)]
 hoejre = [(16, 1)]
 venstre = [(11, 1)]
 
-#def robotDoPWM(pin, tilstand):
-#	dc = stdDC if tilstand else 0
-#	pwm[pin].ChangeDutyCycle(dc)
-
 # Send signal til driver ICen L293D om hvilken retning robotten skal tag.
 def robotDo(opperationer):
-	#print opperationer
 	for opperation in opperationer:
 		GPIO.output(*opperation)
-		#robotDoPWM(*opperation)
 
 # Hent SPI data fra MCP3008 chippen.
 def hentData(kanal):
@@ -66,30 +50,12 @@ def erPaaStregenH():
 def erPaaStregenV():
 	return hentData(0) > graenseVaerdi
 
-# Skifter den retning roboten skal søge efter stregen.
-# Det vil altid være modsat af den sidste retning.
-#def nyRetning():
-#	global sidsteRetning
-#	if sidsteRetning == 1:
-#		sidsteRetning = 0
-#		robotDo(venstre)
-#	else:
-#		sidsteRetning = 1
-#		robotDo(hoejre)
-
-# Genoptager den sidste retning.
-#def genoptag():
-#	if sidsteRetning == 1:
-#		robotDo(hoejre)
-#	else:
-#		robotDo(venstre)
-
 # Vi ryder altid op efter os når vi har brugt robotten.
 def onExit():
 	robotDo(stop)
-	# Stop PWM på alle pins.
+	# Sluk for alle pins.
 	for pin in motorPins:
-		pwm[pin].stop()
+		GPIO.output(pin, 0)
 	# Nulstil GPIO instilningerne.
 	GPIO.cleanup()
 
@@ -127,9 +93,9 @@ try:
 		#7
 		print "#7"
 		robotDo(stop)
-		
+
 # Ved Ctrl+C fanges untagelsen "KeyboardInterrupt".
-except KeyboardInterrupt:	
+except KeyboardInterrupt:
 	onExit()
 finally:
 	onExit()
