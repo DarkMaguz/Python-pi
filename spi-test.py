@@ -25,6 +25,7 @@ def readAdc(channel):
 	return processAdcValue(r)
 
 if __name__ == '__main__':
+<<<<<<< HEAD
 	try:
 		while True:
 			val = readAdc(0)
@@ -32,3 +33,13 @@ if __name__ == '__main__':
 			sleep(0.1)
 	except KeyboardInterrupt:
 		spi.close()
+=======
+    try:
+        while True:
+            val = readAdc(0)
+            print "ADC Result: ", str(val)
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        spi.close() 
+        sys.exit(0)
+>>>>>>> 3cf95b9c71c97adbda0150c222c730e41119fec1

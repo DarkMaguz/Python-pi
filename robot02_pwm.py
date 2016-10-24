@@ -12,6 +12,8 @@ spi.open(0, 0) # Åben port 0, enhed 0.
 graenseVaerdi = 50
 # Den retning robotten sidst drejede. 0 for venstre og 1 for højre.
 sidsteRetning = 1
+# Standart duty cycle.
+stdDC = 40
 
 # Konfigurer Raspberry PI's GPIO.
 # Fortæl hvilken måde hvorpå vi fortolker GPIO pin's på.
@@ -19,12 +21,18 @@ GPIO.setmode(GPIO.BOARD)
 
 # Lav en liste indeholdende pins der bruges til mortorne.
 motorPins = [11, 12, 15, 16]
+# Initialiser en dict til og holde på pwm objekter.
+pwm = {}
 
 # Set pin nummerne i "motorPins" til output.
 for pin in motorPins:
 	GPIO.setup(pin, GPIO.OUT)
 	# Sørg for at slukke før vi tænder, så løber robotten ikke væk fra os.
 	GPIO.output(pin, 0)
+	# Initialiser pwm på "pin" med 50Hz.
+	pwm[pin] = GPIO.PWM(pin, 50)
+	# Set duty cycle til 0, så løber robotten ikke væk fra os.
+	pwm[pin].start(0)
 
 # Lav en liste af tuples til hver operation af motorne.
 if True:
@@ -40,12 +48,16 @@ else:
 	hoejre = "højre"
 	venstre = "venstre"
 
+def robotDoPWM(pin, tilstand):
+	dc = stdDC if tilstand else 0
+	pwm[pin].ChangeDutyCycle(dc)
 
 # Send signal til driver ICen L293D om hvilken retning robotten skal tag.
-def robotDo(operationer):
-	#print operationer
-	for operation in operationer:
-		GPIO.output(*operation)
+def robotDo(opperationer):
+	#print opperationer
+	for opperation in opperationer:
+		#GPIO.output(*opperation)
+		robotDoPWM(*opperation)
 
 # Hent SPI data fra MCP3008 chippen.
 def hentData(kanal):
@@ -78,6 +90,9 @@ def genoptag():
 
 def onExit():
 	robotDo(stop)
+	# Stop PWM på alle pins.
+	for pin in motorPins:
+		pwm[pin].stop()
 	# Nulstil GPIO instilningerne.
 	GPIO.cleanup()
 
@@ -111,4 +126,3 @@ finally:
 	onExit()
 
 onExit()
-
