@@ -10,9 +10,9 @@ display_height = 600
 
 black = (0,0,0)
 white = (255,255,255)
-red = (255,0,0)
-green = (0,255,0)
-blue = (0,0,255)
+red = #MANGEL
+green = #MANGEL
+blue = #MANGEL
 
 gameDisplay = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption("Super racer 0.1")
@@ -21,17 +21,17 @@ clock = pygame.time.Clock()
 carImg = pygame.image.load("racer1.png")
 car_width = carImg.get_rect().size[0]
 car_height = carImg.get_rect().size[1]
-car_side_to_side_speed = 10
+car_side_to_side_speed = 60
 
-global big_square_color
+global thing_color
 
-def big_squares_dodged(count):
+def things_dodged(count):
     font = pygame.font.SysFont(None, 25)
     textSurface = font.render("Dodged: "+str(count), True, black)
     gameDisplay.blit(textSurface, (0,0))
 
-def big_squares(big_squarex, big_squarey, big_squarew, big_squareh, color):
-    pygame.draw.rect(gameDisplay, color, [big_squarex, big_squarey, big_squarew, big_squareh])
+def things(thingx, thingy, thingw, thingh, color):
+    pygame.draw.rect(gameDisplay, color, [thingx, thingy, thingw, thingh])
 
 def car(x, y):
     gameDisplay.blit(carImg, (x, y))
@@ -52,22 +52,22 @@ def message_display(text):
     game_loop()
 
 def crash():
-    message_display("You Crashed!")
+    message_display("") #MANGEL
 
-def crash_test(carx, cary, big_squarex, big_squarey, big_square_width, big_square_height):
+def crash_test(carx, cary, thingx, thingy, thing_width, thing_height):
     crashx = False
     crashy = False
-    global big_square_color
-    big_square_color = blue
+    global thing_color
+    thing_color = blue
 
-    if carx >= big_squarex and carx <= big_squarex + big_square_width:
+    if carx >= thingx and carx <= thingx + thing_width:
         crashx = True
-    elif carx + car_width >= big_squarex and carx + car_width <= big_squarex + big_square_width:
+    elif carx + car_width >= thingx and carx + car_width <= thingx + thing_width:
         crashx = True
 
-    if cary >= big_squarey and cary <= big_squarey + big_square_height:
+    if cary >= thingy and cary <= thingy + thing_height:
         crashy = True
-    elif cary + car_height >= big_squarey and cary + car_height <= big_squarey + big_square_height:
+    elif cary + car_height >= thingy and cary + car_height <= thingy + thing_height:
         crashy = True
     
     return crashx and crashy
@@ -80,12 +80,12 @@ def game_loop():
     x = (display_width - car_width) / 2
     y = display_height * 0.8 #(display_height - car_height) / 2
 
-    big_square_speed = 5
-    big_square_width = 100
-    big_square_height = 100
-    big_square_startx = random.randrange(0, display_width - big_square_width)
-    big_square_starty = -600
-    big_square_color = blue
+    thing_speed = 5
+    thing_width = 100
+    thing_height = 100
+    thing_startx = random.randrange(0, display_width - thing_width)
+    thing_starty = -600
+    thing_color = blue
 
     dodged = 0
 
@@ -108,25 +108,25 @@ def game_loop():
 
         gameDisplay.fill(white)
 
-        big_squares(big_square_startx, big_square_starty, big_square_width, big_square_height, big_square_color)
-        big_square_starty = big_square_starty + big_square_speed
+        things(thing_startx, thing_starty, thing_width, thing_height, thing_color)
+        thing_starty = thing_starty + thing_speed
         
         car(x, y)
-        big_squares_dodged(dodged)
+        things_dodged(dodged)
 
         if x > display_width - car_width or x < 0:
             crash()
             gameExit = True
             continue
 
-        if big_square_starty > display_height:
+        if thing_starty > display_height:
             dodged += 1
-            big_square_speed += 1
-            #big_square_width += (dodged * 1.2)
-            big_square_starty = -big_square_width
-            big_square_startx = random.randrange(0, display_width - math.floor(big_square_width))
+            thing_speed += 1
+            #thing_width += (dodged * 1.2)
+            thing_starty = -thing_width
+            thing_startx = random.randrange(0, display_width - math.floor(thing_width))
 
-        if crash_test(x, y, big_square_startx, big_square_starty, big_square_width, big_square_height):
+        if crash_test(x, y, thing_startx, thing_starty, thing_width, thing_height):
             crash()
             gameExit = True
             continue
